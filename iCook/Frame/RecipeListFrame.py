@@ -1,14 +1,15 @@
 import tkinter as tk
 from tkinter import ttk
 
+import Pmw
 from . import *
 from .. import Recipe, DataBase
 
-class RecipeListFrame(ttk.Frame):
+class RecipeListFrame(Pmw.ScrolledFrame):
 
     def __init__(self,parent=None,recipeList=[],**kwarg):
         assert type(recipeList) in (list,tuple)
-        ttk.Frame.__init__(self,parent,**kwarg)
+        Pmw.ScrolledFrame.__init__(self,parent,**kwarg)
         self.recipeLineList = []
         self.parent = parent
 
@@ -21,16 +22,16 @@ class RecipeListFrame(ttk.Frame):
             i.destroy()
 
         for index, element in enumerate(recipeList):
-            self.recipeLineList.append(RecipeLine(self,element,borderwidth=5,relief='ridge'))
+            self.recipeLineList.append(RecipeLine(self.interior(),self,element,borderwidth=5,relief='ridge'))
             self.recipeLineList[-1].grid(row=index,column=0,sticky=tk.E+tk.W)
 
     def chooseRecipe(self,caller):
         self.parent.chooseRecipe(caller.recipe)
 
 class RecipeLine(ttk.Frame):
-    def __init__(self,parent,recipe,**kwarg):
+    def __init__(self,parentFrame,parent,recipe,**kwarg):
         assert type(recipe) is Recipe.Recipe
-        ttk.Frame.__init__(self,parent,**kwarg)
+        ttk.Frame.__init__(self,parentFrame,**kwarg)
         self.parent = parent
         self.recipe = recipe
 

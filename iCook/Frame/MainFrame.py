@@ -1,19 +1,24 @@
 
 import tkinter as tk
 from tkinter import ttk
-
+import Pmw
 
 from . import Frame, RecipeFrame, SearchFrame, UpdateDBFrame, CreateRecipeFrame
 from .. import Recipe
 
 
-class MainFrame(ttk.Frame):
+class MainFrame(tk.Frame):
 
     def __init__(self):
         tk.Frame.__init__(self,None)
 
+        # self.geometry('800x600')
+
+
 
         self.pack(fill=tk.BOTH, expand=1)
+        # self.grid_propagate(0)
+        self.master.geometry('800x600')
         self.master.title("iCook, do you?")
 
         self.noteBook = ttk.Notebook(self)
