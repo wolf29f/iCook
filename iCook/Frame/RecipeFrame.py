@@ -14,6 +14,9 @@ class RecipeFrame(Frame.Frame):
         Frame.Frame.__init__(self,parent,mainFrame,padding=5,**kwarg)
         self.recipe = Recipe.Recipe()
 
+        self.editButton = ttk.Button(self, text="Edit", command=self.editRecipe)
+        # self.saveButton.pack(side=tk.TOP)
+
         self.favChoice = tk.IntVar()
         self.favButton = ttk.Checkbutton(self, text="Ajouter aux favoris",variable=self.favChoice,command=self.addToFav)
         self.favButton.pack(side=tk.TOP)
@@ -28,9 +31,19 @@ class RecipeFrame(Frame.Frame):
         self.textContent.pack(fill=tk.BOTH, expand=1)
 
 
+    def editRecipe(self):
+        self.mainFrame.getToAddRecipeFrame(self.recipe)
+
     def loadRecipe(self, recipe):
         assert type(recipe) is Recipe.Recipe
         self.recipe = recipe
+
+
+        if self.recipe.isLocal:
+            self.editButton.pack(side=tk.TOP,anchor="e") 
+        else:
+            self.editButton.pack_forget()
+
 
         if self.recipe.isFav:
             self.favChoice.set(1)

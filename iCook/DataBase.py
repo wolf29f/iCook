@@ -24,37 +24,59 @@ class DataBase(object):
         conn = sqlite3.connect(self.dbName,detect_types= sqlite3.PARSE_COLNAMES)
         c=conn.cursor()
 
-        result = []
+        resultOnline = []
+        resultLocal = []
         try:
+            #online DB
             if favorite:
                 if ingredientList == [] and name!="":
                     c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients,numberPeople FROM onlineRecipe WHERE (name LIKE ? AND isFav='True') """, ["%"+name+"%",])        
-                    result += c.fetchall() 
-                    c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM localRecipe WHERE (name LIKE ? AND isFav='True') """, ["%"+name+"%",])
-                    result += c.fetchall()
+                    resultOnline += c.fetchall()                    
                 else:
                     for ingredient in ingredientList:
-                        c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM localRecipe WHERE (ingredients LIKE ? AND name LIKE ? AND isFav='True') """, ["%"+ingredient+"%","%"+name+"%"])
-                        result += c.fetchall()
                         c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM onlineRecipe WHERE (ingredients LIKE ? AND name LIKE ? AND isFav='True') """, ["%"+ingredient+"%","%"+name+"%"])
-                        result += c.fetchall()
+                        resultOnline += c.fetchall()
             else:
                 if ingredientList == [] and name!="":
                     c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients,numberPeople FROM onlineRecipe WHERE (name LIKE ?) """, ["%"+name+"%",])        
-                    result += c.fetchall() 
+                    resultOnline += c.fetchall()
+                else:
+                    for ingredient in ingredientList:
+                        c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM onlineRecipe WHERE (ingredients LIKE ? AND name LIKE ?) """, ["%"+ingredient+"%","%"+name+"%"])
+                        resultOnline += c.fetchall()    
+
+            for index, val in enumerate(resultOnline):
+                resultOnline[index]=val+(False,)  #Last element allow to know if the recipe is local
+
+            #local DB
+            if favorite:
+                if ingredientList == [] and name!="":
+                    c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM localRecipe WHERE (name LIKE ? AND isFav='True') """, ["%"+name+"%",])
+                    resultLocal += c.fetchall()
+                else:
+                    for ingredient in ingredientList:
+                        c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM localRecipe WHERE (ingredients LIKE ? AND name LIKE ? AND isFav='True') """, ["%"+ingredient+"%","%"+name+"%"])
+                        resultLocal += c.fetchall()
+            else:
+                if ingredientList == [] and name!="":
                     c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM localRecipe WHERE (name LIKE ?) """, ["%"+name+"%",])
-                    result += c.fetchall()
+                    resultLocal += c.fetchall()
                 else:
                     for ingredient in ingredientList:
                         c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM localRecipe WHERE (ingredients LIKE ? AND name LIKE ?) """, ["%"+ingredient+"%","%"+name+"%"])
-                        result += c.fetchall()
-                        c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM onlineRecipe WHERE (ingredients LIKE ? AND name LIKE ?) """, ["%"+ingredient+"%","%"+name+"%"])
-                        result += c.fetchall()    
+                        resultLocal += c.fetchall()
+
+
+            for index, val in enumerate(resultLocal):
+                resultLocal[index]=val+(True,)  #Last element allow to know if the recipe is local
+
         except sqlite3.OperationalError:
             self.noDBMessage()
             return None
-
+        result = resultLocal+resultOnline
         sortedResult = []
+
+
         for r in result:
             score = 0
             if name in r[0]:
@@ -67,8 +89,7 @@ class DataBase(object):
         sorted(sortedResult,key=lambda r: r[1])
 
         for r, score in sortedResult:
-            yield Recipe.Recipe(r[0],r[1],r[2],r[3],ast.literal_eval(r[4]),r[5],r[6])
-        
+            yield Recipe.Recipe(r[0],r[1],r[2],r[3],ast.literal_eval(r[4]),r[5],r[6],isLocal=r[-1])
 
     def addRecipe(self,recipe):
         assert type(recipe) is Recipe.Recipe
@@ -79,14 +100,18 @@ class DataBase(object):
             c.close()
             self.createLocalDB()
 
-        c.execute(""" SELECT * FROM localRecipe WHERE (name LIKE ? AND pictureLocation LIKE ? AND recipe LIKE ? AND isFav LIKE ?  AND ingredients LIKE ?  AND numberPeople LIKE ?)""", [
-                    recipe.name, recipe.pictureLocation, recipe.recipe, "False", recipe.ingredients, recipe.nbrPeople])
-        if c.fetchall() != []:
-            c.close()
-            return
-        c.execute(""" INSERT INTO localRecipe (name, pictureLocation, recipe, recipeId, isFav, ingredients, numberPeople)
+        c.execute(""" SELECT * FROM localRecipe WHERE (recipeId = ?)""", [recipe.recipeId])
+        c.fetchall()
+        if c==[]:
+            c.execute(""" INSERT INTO localRecipe (name, pictureLocation, recipe, recipeId, isFav, ingredients, numberPeople)
                                     VALUES (?, ?, ?, ?, ?, ?, ?)""", 
                                     [recipe.name, recipe.pictureLocation, recipe.recipe, recipe.recipeId, "False", recipe.ingredients, recipe.nbrPeople])
+        else:
+            c.execute(""" UPDATE localRecipe
+                SET name = ?, pictureLocation = ?, recipe = ?, isFav = ?, ingredients = ?, numberPeople = ?
+                WHERE recipeId = ?""", 
+                [recipe.name, recipe.pictureLocation, recipe.recipe, recipe.isFav, recipe.ingredients, recipe.nbrPeople, recipe.recipeId])
+
         conn.commit()
         c.close()
                                 

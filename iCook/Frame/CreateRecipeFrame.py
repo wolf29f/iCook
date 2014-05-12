@@ -3,7 +3,6 @@ from tkinter import ttk
 from uuid import uuid4
 import tkinter.messagebox as messagebox
 
-
 from . import *
 from .. import Recipe, DataBase
 
@@ -13,14 +12,18 @@ class CreateRecipeFrame(Frame.Frame):
         Frame.Frame.__init__(self,parent,mainFrame,padding=5,**kwarg)
         
         self.recipe = Recipe.Recipe()
+        self.recipe.recipeId = uuid4().hex
 
         self.recipeName = tk.StringVar()
-        self.recipePicLocation = ""
-        self.recipeComponent = ""
-        self.recipeContent = ""
+        # self.recipePicLocation = ""
+        # self.recipeComponent = ""
+        # self.recipeContent = ""
         
         self.recipeNameLabel = ttk.Label(self,text="Nom de la recette :")
         self.recipeNameLabel.grid(column=0)
+
+        self.newRecipe = ttk.Button(self, text="Nouvelle recette", command=self.editRecipe)
+        self.newRecipe.grid(row=0,column=3)
 
         self.recipeNameEntry = ttk.Entry(self,textvariable=self.recipeName) 
         self.recipeNameEntry.grid(column=1,stick='w')
@@ -39,7 +42,6 @@ class CreateRecipeFrame(Frame.Frame):
         self.recipeComponentText = tk.Text(self,height = 10)
         self.recipeComponentText.grid(column=1)
 
-
         self.recipeContentLabel = ttk.Label(self,text="Recette :")
         self.recipeContentLabel.grid(column=0)
 
@@ -49,14 +51,35 @@ class CreateRecipeFrame(Frame.Frame):
         self.saveButton = ttk.Button(self, text="Enregistrer", command=self.saveRecipe)
         self.saveButton.grid(columnspan=2,pady=(5,0))
 
-        self.recipe = Recipe.Recipe()
+        self.editRecipe()
+
+    def editRecipe(self,recipe=None):
+        if recipe:
+            self.recipe = recipe
+            self.recipeName.set(self.recipe.name)
+            # self.pictureLocation = pictureLocation
+            self.recipeContentText.delete('1.0','end')
+            self.recipeContentText.insert('1.0', self.recipe.recipe) 
+
+            self.recipe.recipeId = self.recipe.recipeId
+            
+            self.recipeComponentText.delete('1.0','end') 
+            self.recipeComponentText.insert('1.0', self.recipe.ingredients)
+
+            self.nbrPeople.set(self.recipe.nbrPeople)
+        else:
+            self.recipeName.set("")
+            # self.pictureLocation = pictureLocation
+            self.recipeContentText.delete('1.0','end')
+            self.recipe.recipeId = uuid4().hex
+            self.recipe.isFav = False
+            self.recipeComponentText.delete('1.0','end')
+            self.nbrPeople.set(4)
 
     def saveRecipe(self):
         self.recipe.name = self.recipeName.get()
         # self.pictureLocation = pictureLocation
         self.recipe.recipe = self.recipeContentText.get('1.0','end')
-        self.recipe.recipeId = uuid4().hex
-        self.recipe.isFav = False
 
         ingredients=self.recipeComponentText.get('1.0','end')
         ingredients=ingredients.split("\n")
@@ -73,7 +96,6 @@ class CreateRecipeFrame(Frame.Frame):
         db = DataBase.DataBase()
         db.addRecipe(self.recipe)
         self.succesSaveMessage()
-        # self.nbrPeople = nbrPeople
 
     def succesSaveMessage(self):
         messagebox.showinfo("Succes", "Votre recette à bien été enregistré, félicitation ! Vous pourez desormais la retrouver avec les autres recettes") 

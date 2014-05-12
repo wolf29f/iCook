@@ -52,7 +52,8 @@ class MainFrame(ttk.Frame):
         self.recipeFrame.loadRecipe(recipe)
         self.noteBook.select(self.tabs["recipeFrame"])
 
-    def getToAddRecipeFrame(self):
+    def getToAddRecipeFrame(self,recipe):
+        self.createRecipeFrame.editRecipe(recipe)
         self.noteBook.select(self.tabs["createRecipeFrame"])
 
 
