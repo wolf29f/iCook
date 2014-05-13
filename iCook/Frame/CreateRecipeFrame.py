@@ -3,6 +3,7 @@ from tkinter import ttk
 from uuid import uuid4
 import tkinter.messagebox as messagebox
 
+import Pmw
 from . import *
 from .. import Recipe, DataBase
 
@@ -19,37 +20,42 @@ class CreateRecipeFrame(Frame.Frame):
         # self.recipeComponent = ""
         # self.recipeContent = ""
         
-        self.recipeNameLabel = ttk.Label(self,text="Nom de la recette :")
-        self.recipeNameLabel.grid(column=0)
 
-        self.newRecipe = ttk.Button(self, text="Nouvelle recette", command=self.editRecipe)
-        self.newRecipe.grid(row=0,column=3)
+
+        self.recipeNameLabel = ttk.Label(self,text="Nom de la recette :")
+        self.recipeNameLabel.grid(column=0,row=0)
 
         self.recipeNameEntry = ttk.Entry(self,textvariable=self.recipeName) 
-        self.recipeNameEntry.grid(column=1,stick='w')
+        self.recipeNameEntry.grid(column=1,row=0,stick='w')
+
+        self.newRecipe = ttk.Button(self, text="Nouvelle recette", command=self.editRecipe)
+        self.newRecipe.grid(row=0,column=3)        
 
         self.nbrPeople= tk.IntVar()
         self.nbrPeople.set(4)
         self.nbrPeopleLabel = ttk.Label(self, text="Ce plat est prévu pour :")
-        self.nbrPeopleLabel.grid(column=0)
+        self.nbrPeopleLabel.grid(column=0,row=1)
 
         self.nbrPeopleSpinbox = tk.Spinbox(self, textvariable=self.nbrPeople, values=(1,2,3,4,5,6,7,8,9,10,11,12))
-        self.nbrPeopleSpinbox.grid(column=1,stick='w')
+        self.nbrPeopleSpinbox.grid(column=1,row=1,stick='w')
 
         self.recipeComponentLabel = ttk.Label(self,text="Ingredients :")
-        self.recipeComponentLabel.grid(column=0)
+        self.recipeComponentLabel.grid(column=0,row=2)
 
         self.recipeComponentText = tk.Text(self,height = 10)
-        self.recipeComponentText.grid(column=1)
+        self.recipeComponentText.grid(column=1,row=2)
 
         self.recipeContentLabel = ttk.Label(self,text="Recette :")
-        self.recipeContentLabel.grid(column=0)
+        self.recipeContentLabel.grid(column=0,row=3)
+
+
+        # self.recipeContentText = Pmw.ScrolledText(self,labelpos="wn",label_text="Recette :")
 
         self.recipeContentText = tk.Text(self)
-        self.recipeContentText.grid(column=1)
-        
+        self.recipeContentText.grid(column=1,row=3)
+
         self.saveButton = ttk.Button(self, text="Enregistrer", command=self.saveRecipe)
-        self.saveButton.grid(columnspan=2,pady=(5,0))
+        self.saveButton.grid(columnspan=3,pady=(5,0))
 
         self.editRecipe()
 

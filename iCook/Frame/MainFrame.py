@@ -10,16 +10,16 @@ from .. import Recipe
 class MainFrame(tk.Frame):
 
     def __init__(self):
-        tk.Frame.__init__(self,None)
-
-        # self.geometry('800x600')
-
+        tk.Frame.__init__(self,None,width=800,height=600)
 
 
         self.pack(fill=tk.BOTH, expand=1)
-        # self.grid_propagate(0)
+        # self.pack_propagate(0)
         self.master.geometry('800x600')
         self.master.title("iCook, do you?")
+        # self.master.resizable(0,0)
+
+
 
         self.noteBook = ttk.Notebook(self)
         self.noteBook.pack(fill=tk.BOTH, expand=1)
