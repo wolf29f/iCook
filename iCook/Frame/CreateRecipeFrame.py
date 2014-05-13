@@ -12,24 +12,24 @@ class CreateRecipeFrame(Frame.Frame):
     def __init__(self,parent=None,mainFrame=None,**kwarg):
         Frame.Frame.__init__(self,parent,mainFrame,padding=5,**kwarg)
         
+        self.columnconfigure(1, weight=1)
+
+        self.rowconfigure(3, weight=1)
+
         self.recipe = Recipe.Recipe()
-        self.recipe.recipeId = uuid4().hex
 
         self.recipeName = tk.StringVar()
         # self.recipePicLocation = ""
         # self.recipeComponent = ""
         # self.recipeContent = ""
         
-
-
         self.recipeNameLabel = ttk.Label(self,text="Nom de la recette :")
         self.recipeNameLabel.grid(column=0,row=0)
-
         self.recipeNameEntry = ttk.Entry(self,textvariable=self.recipeName) 
-        self.recipeNameEntry.grid(column=1,row=0,stick='w')
+        self.recipeNameEntry.grid(column=1,row=0,sticky='w')
 
         self.newRecipe = ttk.Button(self, text="Nouvelle recette", command=self.editRecipe)
-        self.newRecipe.grid(row=0,column=3)        
+        self.newRecipe.grid(row=0,column=1,sticky="e")        
 
         self.nbrPeople= tk.IntVar()
         self.nbrPeople.set(4)
@@ -43,19 +43,18 @@ class CreateRecipeFrame(Frame.Frame):
         self.recipeComponentLabel.grid(column=0,row=2)
 
         self.recipeComponentText = tk.Text(self,height = 10)
-        self.recipeComponentText.grid(column=1,row=2)
+        self.recipeComponentText.grid(column=1,row=2,sticky=tk.E+tk.W+tk.S+tk.N)
 
         self.recipeContentLabel = ttk.Label(self,text="Recette :")
         self.recipeContentLabel.grid(column=0,row=3)
 
+        self.recipeContentText = Pmw.ScrolledText(self)
 
-        # self.recipeContentText = Pmw.ScrolledText(self,labelpos="wn",label_text="Recette :")
-
-        self.recipeContentText = tk.Text(self)
-        self.recipeContentText.grid(column=1,row=3)
+        #self.recipeContentText = tk.Text(self)
+        self.recipeContentText.grid(column=1,row=3,sticky=tk.E+tk.W+tk.S+tk.N)
 
         self.saveButton = ttk.Button(self, text="Enregistrer", command=self.saveRecipe)
-        self.saveButton.grid(columnspan=3,pady=(5,0))
+        self.saveButton.grid(column=0,row=4,columnspan=3,pady=(5,0))
 
         self.editRecipe()
 

@@ -10,16 +10,17 @@ from .. import Recipe
 class MainFrame(tk.Frame):
 
     def __init__(self):
-        tk.Frame.__init__(self,None,width=800,height=600)
-
-
+        tk.Frame.__init__(self,None)
+        
+        
+        s=ttk.Style()
+        # s.configure("TNotebook", background="#ff0000")
+        # print(s.element_options('TNotebook'))
         self.pack(fill=tk.BOTH, expand=1)
         # self.pack_propagate(0)
         self.master.geometry('800x600')
         self.master.title("iCook, do you?")
         # self.master.resizable(0,0)
-
-
 
         self.noteBook = ttk.Notebook(self)
         self.noteBook.pack(fill=tk.BOTH, expand=1)
@@ -34,11 +35,10 @@ class MainFrame(tk.Frame):
         self.noteBook.add(self.createRecipeFrame,text="Ajouter recette")
 
         self.updateDBFrame=UpdateDBFrame.UpdateDBFrame(parent=self.noteBook,mainFrame=self) 
-        self.noteBook.add(self.updateDBFrame,text="Màj BDD")
+        self.noteBook.add(self.updateDBFrame,text="Mise à jour")
 
         self.tabs = {"searchFrame":0,
                     "recipeFrame":1,
-                    # "favoritesFrame":2,
                     "createRecipeFrame":2,
                     "updateDBFrame":3}
 

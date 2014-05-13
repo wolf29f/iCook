@@ -30,7 +30,7 @@ class DataBase(object):
             #online DB
             if favorite:
                 if ingredientList == [] and name!="":
-                    c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients,numberPeople FROM onlineRecipe WHERE (name LIKE ? AND isFav='True') """, ["%"+name+"%",])        
+                    c.execute(""" SELECT namep,ictureLocation,recipe,recipeId,isFav,ingredients,numberPeople FROM onlineRecipe WHERE (name LIKE ? AND isFav='True') """, ["%"+name+"%",])        
                     resultOnline += c.fetchall()                    
                 else:
                     for ingredient in ingredientList:
@@ -92,6 +92,7 @@ class DataBase(object):
             yield Recipe.Recipe(r[0],r[1],r[2],r[3],ast.literal_eval(r[4]),r[5],r[6],isLocal=r[-1])
 
     def addRecipe(self,recipe):
+
         assert type(recipe) is Recipe.Recipe
         conn = sqlite3.connect(self.dbName,detect_types= sqlite3.PARSE_COLNAMES)
         c=conn.cursor()
@@ -101,16 +102,17 @@ class DataBase(object):
             self.createLocalDB()
 
         c.execute(""" SELECT * FROM localRecipe WHERE (recipeId = ?)""", [recipe.recipeId])
-        c.fetchall()
-        if c==[]:
+        result = c.fetchall()
+        if result==[]:
+            print("toto")
             c.execute(""" INSERT INTO localRecipe (name, pictureLocation, recipe, recipeId, isFav, ingredients, numberPeople)
                                     VALUES (?, ?, ?, ?, ?, ?, ?)""", 
                                     [recipe.name, recipe.pictureLocation, recipe.recipe, recipe.recipeId, "False", recipe.ingredients, recipe.nbrPeople])
         else:
             c.execute(""" UPDATE localRecipe
-                SET name = ?, pictureLocation = ?, recipe = ?, isFav = ?, ingredients = ?, numberPeople = ?
-                WHERE recipeId = ?""", 
-                [recipe.name, recipe.pictureLocation, recipe.recipe, recipe.isFav, recipe.ingredients, recipe.nbrPeople, recipe.recipeId])
+            SET name = ?, pictureLocation = ?, recipe = ?, isFav = ?, ingredients = ?, numberPeople = ?
+            WHERE recipeId = ?""", 
+            [recipe.name, recipe.pictureLocation, recipe.recipe, recipe.isFav, recipe.ingredients, recipe.nbrPeople, recipe.recipeId])
 
         conn.commit()
         c.close()
@@ -129,7 +131,7 @@ class DataBase(object):
     def addFav(self,recipeId):
         assert type(recipeId) is str
         conn = sqlite3.connect(self.dbName,detect_types= sqlite3.PARSE_COLNAMES)
-        c=conn.cursor()        
+        c=conn.cursor()
 
         result = []
         c.execute(""" SELECT * FROM onlineRecipe WHERE isFav='True' AND recipeId = (?)""", [recipeId,])
