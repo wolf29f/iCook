@@ -104,9 +104,8 @@ class DataBase(object):
         c.execute(""" SELECT * FROM localRecipe WHERE (recipeId = ?)""", [recipe.recipeId])
         result = c.fetchall()
         if result==[]:
-            print("toto")
-            c.execute(""" INSERT INTO localRecipe (name, pictureLocation, recipe, recipeId, isFav, ingredients, numberPeople)
-                                    VALUES (?, ?, ?, ?, ?, ?, ?)""", 
+            c.execute("""INSERT INTO localRecipe (name, pictureLocation, recipe, recipeId, isFav, ingredients, numberPeople)
+                                    VALUES (?, ?, ?, ?, ?, ?, ?)""",
                                     [recipe.name, recipe.pictureLocation, recipe.recipe, recipe.recipeId, "False", recipe.ingredients, recipe.nbrPeople])
         else:
             c.execute(""" UPDATE localRecipe

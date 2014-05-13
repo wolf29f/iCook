@@ -38,6 +38,10 @@ class RecipeFrame(Frame.Frame):
         assert type(recipe) is Recipe.Recipe
         self.recipe = recipe
 
+        # print(os.path.dirname(os.path.realpath(__file__))+"/../res/pic/")
+        # try:
+        pic = tk.BitmapImage(os.path.dirname(os.path.realpath(__file__))+"/../res/pic/"+self.recipe.pictureLocation)
+
 
         if self.recipe.isLocal:
             self.editButton.pack(side=tk.TOP,anchor="e") 
