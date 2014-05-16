@@ -13,7 +13,7 @@ class RecipeFrame(Frame.Frame):
     def __init__(self,parent=None,mainFrame=None,**kwarg):
         Frame.Frame.__init__(self,parent,mainFrame,padding=5,**kwarg)
         self.recipe = Recipe.Recipe()
-
+        self.pic = None
         self.editButton = ttk.Button(self, text="Edit", command=self.editRecipe)
         # self.saveButton.pack(side=tk.TOP)
 
@@ -40,7 +40,8 @@ class RecipeFrame(Frame.Frame):
 
         # print(os.path.dirname(os.path.realpath(__file__))+"/../res/pic/")
         # try:
-        pic = tk.BitmapImage(os.path.dirname(os.path.realpath(__file__))+"/../res/pic/"+self.recipe.pictureLocation)
+        print(os.path.dirname(os.path.realpath(__file__))+"/../res/pic/"+self.recipe.pictureLocation)
+        self.pic = tk.PhotoImage(file=os.path.dirname(os.path.realpath(__file__))+"/../res/pic/"+self.recipe.pictureLocation)
 
 
         if self.recipe.isLocal:
@@ -57,6 +58,7 @@ class RecipeFrame(Frame.Frame):
         self.textContent['state'] = 'normal'
         self.textContent.delete('1.0','end')
 
+        self.textContent.image_create('end',image=self.pic)
         self.textContent.insert('end',self.recipe.name+"\n\n",("header",))
         
         self.textContent.insert('end',"Recette pour %i personne(s)"%self.recipe.nbrPeople+"\n\n")
