@@ -4,6 +4,8 @@ import sqlite3
 import tkinter.messagebox as messagebox
 import ast
 
+from . import rootUrl
+
 class DataBase(object):
 
     def __init__(self):
@@ -12,7 +14,8 @@ class DataBase(object):
         conn = sqlite3.connect(self.dbName,detect_types= sqlite3.PARSE_COLNAMES)
         c=conn.cursor()
         c.execute("""SELECT name FROM sqlite_master WHERE type='table' AND name='onlineRecipe';""")
-        if c.fetchall() == []:
+        r = c.fetchall()
+        if r == []:
             c.close()
             self.noDBMessage()
 

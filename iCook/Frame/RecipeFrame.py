@@ -3,10 +3,10 @@ from tkinter import ttk
 from tkinter import font
 
 from . import *
-from .. import Recipe, DataBase
+from .. import Recipe, DataBase, rootUrl
 
 import tkinter.messagebox as messagebox
-
+import urllib.request
 
 class RecipeFrame(Frame.Frame):
 
@@ -52,8 +52,25 @@ class RecipeFrame(Frame.Frame):
 
         # print(os.path.dirname(os.path.realpath(__file__))+"/../res/pic/")
         # try:
-        print(os.path.dirname(os.path.realpath(__file__))+"/../res/pic/"+self.recipe.pictureLocation)
-        self.pic = tk.PhotoImage(file=os.path.dirname(os.path.realpath(__file__))+"/../res/pic/"+self.recipe.pictureLocation)
+        # print(os.path.dirname(os.path.realpath(__file__))+"/../res/pic/"+self.recipe.pictureLocation)
+        picPath = os.path.dirname(os.path.realpath(__file__))+"/../res/pic/"+self.recipe.pictureLocation
+        try:
+            self.pic = tk.PhotoImage(file=picPath)
+        except tk.TclError:
+            self.pic = None
+            if recipe.isLocal:
+                messagebox.showerror("Pas d'image", "Aucun image n'a été trouvé sur votre ordinateur, veuillez re-selection l'image en éditant la recette")
+            else:
+                try:
+                    print(rootUrl+"res/pic/"+self.recipe.pictureLocation)
+                    urllib.request.urlretrieve(rootUrl+"res/pic/"+self.recipe.pictureLocation, picPath)
+                    try:
+                        self.pic = tk.PhotoImage(file=picPath)
+                    except tk.TclError:
+                        messagebox.showerror("Pas d'image", "Aucun image n'a été trouvé, il n'a pas été possible de la charger, veuillez ré-essayer plus tard")
+                except urllib.request.HTTPError:
+                        messagebox.showerror("Erreure de connexion'", "Une erreure de connexion est survenus, veuillez ré-essayer plus tard")
+            
         self.picLabel.config(image=self.pic)
 
         if self.recipe.isLocal:
@@ -61,26 +78,18 @@ class RecipeFrame(Frame.Frame):
         else:
             self.editButton.pack_forget()
 
-
         if self.recipe.isFav:
             self.favChoice.set(1)
         else:
             self.favChoice.set(0)
 
         self.textContent['state'] = 'normal'
-
         self.textContent.delete('1.0','end')
-
-        self.textContent.insert('end',"\n"+self.recipe.name+"\n\n",("header",))
-        
+        self.textContent.insert('end',"\n"+self.recipe.name+"\n\n",("header",))        
         self.textContent.insert('end',"Recette pour %i personne(s)"%self.recipe.nbrPeople+"\n\n")
-
         self.textContent.insert('end',"Ingredients :\n")
         self.textContent.insert('end',recipe.ingredients+"\n","list") 
-
         self.textContent.insert('end',"Réalisation\n\n",("header2"))
-
-
         self.textContent.insert('end',self.recipe.recipe)
         self.textContent['state'] = 'disable'
         
