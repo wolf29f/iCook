@@ -16,17 +16,13 @@ class RecipeFrame(Frame.Frame):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
 
-
         self.recipe = Recipe.Recipe()
         self.pic = None
         self.editButton = ttk.Button(self, text="Edit", command=self.editRecipe)
-        # self.saveButton.pack(side=tk.TOP)
 
         self.favChoice = tk.IntVar()
         self.favButton = ttk.Checkbutton(self, text="Ajouter aux favoris",variable=self.favChoice,command=self.addToFav)
-        # self.favButton.pack(side=tk.TOP)
         self.favButton.grid(row=0,column=0,sticky=tk.E+tk.W)
-
 
         self.textContent = tk.Text(self,state="disable")
         self.textContent.tag_config("header",font=font.Font(size=22),justify="center")
@@ -34,25 +30,19 @@ class RecipeFrame(Frame.Frame):
         self.textContent.tag_config("pic",justify="right")
 
         self.textContent.tag_config("list",lmargin1=20,lmargin2=20)
-
-        # self.textContent.pack(fill=tk.BOTH, expand=1)
         self.textContent.grid(row=1,column=0,sticky=tk.E+tk.W+tk.S+tk.N)
 
         self.picLabel = tk.Label(self)
         self.picLabel.grid(row=1,column=0,sticky=tk.E+tk.N,padx=(5,5),pady=(5,5))
 
 
-
     def editRecipe(self):
         self.mainFrame.getToAddRecipeFrame(self.recipe)
+
 
     def loadRecipe(self, recipe):
         assert type(recipe) is Recipe.Recipe
         self.recipe = recipe
-
-        # print(os.path.dirname(os.path.realpath(__file__))+"/../res/pic/")
-        # try:
-        # print(os.path.dirname(os.path.realpath(__file__))+"/../res/pic/"+self.recipe.pictureLocation)
         picPath = os.path.dirname(os.path.realpath(__file__))+"/../res/pic/"+self.recipe.pictureLocation
         try:
             self.pic = tk.PhotoImage(file=picPath)
@@ -69,10 +59,8 @@ class RecipeFrame(Frame.Frame):
                     except tk.TclError:
                         messagebox.showerror("Pas d'image", "Aucun image n'a été trouvé, il n'a pas été possible de la charger, veuillez ré-essayer plus tard")
                 except (urllib.request.HTTPError,urllib.request.URLError):
-                        messagebox.showerror("Erreure de connexion'", "Une erreure de connexion est survenus, veuillez ré-essayer plus tard")
-            
+                        messagebox.showerror("Erreur de connexion'", "Une erreur de connexion est survenue, veuillez ré-essayer plus tard")            
         self.picLabel.config(image=self.pic)
-
         if self.recipe.isLocal:
             self.editButton.pack(side=tk.TOP,anchor="e") 
         else:

@@ -9,16 +9,19 @@ from . import rootUrl
 class DataBase(object):
 
     def __init__(self):
-        self.dbName = "iCook/recipeBDD"
+        self.dbName = "iCook/res/recipeBDD"
 
         conn = sqlite3.connect(self.dbName,detect_types= sqlite3.PARSE_COLNAMES)
         c=conn.cursor()
-        c.execute("""SELECT name FROM sqlite_master WHERE type='table' AND name='onlineRecipe';""")
+        c.execute("""SELECT name FROM sqlite_master WHERE type='table';""")
         r = c.fetchall()
-        if r == []:
-            c.close()
-            self.noDBMessage()
 
+        if not ("onlineRecipe",) in r:
+            self.noDBMessage()
+        if not ("localRecipe",) in r:        
+            self.createLocalDB()
+        c.close()
+        
     def searchRecipe(self,ingredientList=[],name="",favorite=False):
         assert type(ingredientList) in (list,tuple)
         assert type(name) is str
@@ -152,5 +155,10 @@ class DataBase(object):
         messagebox.showinfo("Creation de la base de donnée", "Creation de la base de donnée local contenant vos recettes") 
 
     def updateDB(self):
-        pass
+        try:
+            urllib.request.urlretrieve(rootUrl+"res/pic/recipeBDD"+, self.dbName)
+        except (urllib.request.HTTPError,urllib.request.URLError):
+            messagebox.showerror("Erreur de connexion'", "Une erreur de connexion est survenue, veuillez ré-essayer plus tard")            
+
+
 
