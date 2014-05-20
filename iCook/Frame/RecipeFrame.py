@@ -68,7 +68,7 @@ class RecipeFrame(Frame.Frame):
                         self.pic = tk.PhotoImage(file=picPath)
                     except tk.TclError:
                         messagebox.showerror("Pas d'image", "Aucun image n'a été trouvé, il n'a pas été possible de la charger, veuillez ré-essayer plus tard")
-                except urllib.request.HTTPError:
+                except (urllib.request.HTTPError,urllib.request.URLError):
                         messagebox.showerror("Erreure de connexion'", "Une erreure de connexion est survenus, veuillez ré-essayer plus tard")
             
         self.picLabel.config(image=self.pic)
