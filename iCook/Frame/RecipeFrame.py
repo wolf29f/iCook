@@ -42,11 +42,12 @@ class RecipeFrame(Frame.Frame):
 
     def loadRecipe(self, recipe):
         assert type(recipe) is Recipe.Recipe
+
         self.recipe = recipe
         picPath = os.path.dirname(os.path.realpath(__file__))+"/../res/pic/"+self.recipe.pictureLocation
         try:
             self.pic = tk.PhotoImage(file=picPath)
-        except tk.TclError:
+        except tk.TclError as e:            
             self.pic = None
             if recipe.isLocal:
                 messagebox.showerror("Pas d'image", "Aucun image n'a été trouvé sur votre ordinateur, veuillez re-selection l'image en éditant la recette")
@@ -60,7 +61,8 @@ class RecipeFrame(Frame.Frame):
                         messagebox.showerror("Pas d'image", "Aucun image n'a été trouvé, il n'a pas été possible de la charger, veuillez ré-essayer plus tard")
                 except (urllib.request.HTTPError,urllib.request.URLError):
                         messagebox.showerror("Erreur de connexion'", "Une erreur de connexion est survenue, veuillez ré-essayer plus tard")            
-        self.picLabel.config(image=self.pic)
+        if self.pic:
+            self.picLabel.config(image=self.pic)
         if self.recipe.isLocal:
             self.editButton.pack(side=tk.TOP,anchor="e") 
         else:
@@ -80,7 +82,7 @@ class RecipeFrame(Frame.Frame):
         self.textContent.insert('end',"Réalisation\n\n",("header2"))
         self.textContent.insert('end',self.recipe.recipe)
         self.textContent['state'] = 'disable'
-        
+        print("toto")
 
     def addToFav(self):
         db = DataBase.DataBase()

@@ -76,7 +76,7 @@ class CreateRecipeFrame(Frame.Frame):
             self.recipeName.set("")
             # self.pictureLocation = pictureLocation
             self.recipeContentText.delete('1.0','end')
-            self.recipe.recipeId = uuid4().hex
+            self.recipe.recipeId = None
             self.recipe.isFav = False
             self.recipeComponentText.delete('1.0','end')
             self.nbrPeople.set(4)

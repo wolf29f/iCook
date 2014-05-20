@@ -3,8 +3,11 @@ from . import Recipe
 import sqlite3
 import tkinter.messagebox as messagebox
 import ast
+import time
 
 from . import rootUrl
+import urllib.request
+
 
 class DataBase(object):
 
@@ -36,19 +39,19 @@ class DataBase(object):
             #online DB
             if favorite:
                 if ingredientList == [] and name!="":
-                    c.execute(""" SELECT namep,ictureLocation,recipe,recipeId,isFav,ingredients,numberPeople FROM onlineRecipe WHERE (name LIKE ? AND isFav='True') """, ["%"+name+"%",])        
+                    c.execute("""SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients,numberPeople FROM onlineRecipe WHERE (name LIKE ? AND isFav='True') """, ["%"+name+"%",])        
                     resultOnline += c.fetchall()                    
                 else:
                     for ingredient in ingredientList:
-                        c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM onlineRecipe WHERE (ingredients LIKE ? AND name LIKE ? AND isFav='True') """, ["%"+ingredient+"%","%"+name+"%"])
+                        c.execute("""SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM onlineRecipe WHERE (ingredients LIKE ? AND name LIKE ? AND isFav='True') """, ["%"+ingredient+"%","%"+name+"%"])
                         resultOnline += c.fetchall()
             else:
                 if ingredientList == [] and name!="":
-                    c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients,numberPeople FROM onlineRecipe WHERE (name LIKE ?) """, ["%"+name+"%",])        
+                    c.execute("""SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients,numberPeople FROM onlineRecipe WHERE (name LIKE ?) """, ["%"+name+"%",])        
                     resultOnline += c.fetchall()
                 else:
                     for ingredient in ingredientList:
-                        c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM onlineRecipe WHERE (ingredients LIKE ? AND name LIKE ?) """, ["%"+ingredient+"%","%"+name+"%"])
+                        c.execute("""SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM onlineRecipe WHERE (ingredients LIKE ? AND name LIKE ?) """, ["%"+ingredient+"%","%"+name+"%"])
                         resultOnline += c.fetchall()    
 
             for index, val in enumerate(resultOnline):
@@ -57,19 +60,19 @@ class DataBase(object):
             #local DB
             if favorite:
                 if ingredientList == [] and name!="":
-                    c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM localRecipe WHERE (name LIKE ? AND isFav='True') """, ["%"+name+"%",])
+                    c.execute("""SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM localRecipe WHERE (name LIKE ? AND isFav='True') """, ["%"+name+"%",])
                     resultLocal += c.fetchall()
                 else:
                     for ingredient in ingredientList:
-                        c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM localRecipe WHERE (ingredients LIKE ? AND name LIKE ? AND isFav='True') """, ["%"+ingredient+"%","%"+name+"%"])
+                        c.execute("""SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM localRecipe WHERE (ingredients LIKE ? AND name LIKE ? AND isFav='True') """, ["%"+ingredient+"%","%"+name+"%"])
                         resultLocal += c.fetchall()
             else:
                 if ingredientList == [] and name!="":
-                    c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM localRecipe WHERE (name LIKE ?) """, ["%"+name+"%",])
+                    c.execute("""SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM localRecipe WHERE (name LIKE ?) """, ["%"+name+"%",])
                     resultLocal += c.fetchall()
                 else:
                     for ingredient in ingredientList:
-                        c.execute(""" SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM localRecipe WHERE (ingredients LIKE ? AND name LIKE ?) """, ["%"+ingredient+"%","%"+name+"%"])
+                        c.execute("""SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients, numberPeople FROM localRecipe WHERE (ingredients LIKE ? AND name LIKE ?) """, ["%"+ingredient+"%","%"+name+"%"])
                         resultLocal += c.fetchall()
 
 
@@ -105,28 +108,29 @@ class DataBase(object):
             c.close()
             self.createLocalDB()
 
-        c.execute(""" SELECT * FROM localRecipe WHERE (recipeId = ?)""", [recipe.recipeId])
+        c.execute("""SELECT * FROM localRecipe WHERE (recipeId = ?)""", [recipe.recipeId])
         result = c.fetchall()
-        if result==[]:
-            c.execute("""INSERT INTO localRecipe (name, pictureLocation, recipe, recipeId, isFav, ingredients, numberPeople)
-                                    VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                                    [recipe.name, recipe.pictureLocation, recipe.recipe, recipe.recipeId, "False", recipe.ingredients, recipe.nbrPeople])
-        else:
-            c.execute(""" UPDATE localRecipe
+        
+        if recipe.recipeId:
+            c.execute("""UPDATE localRecipe
             SET name = ?, pictureLocation = ?, recipe = ?, isFav = ?, ingredients = ?, numberPeople = ?
-            WHERE recipeId = ?""", 
+            WHERE recipeId = ?""",
             [recipe.name, recipe.pictureLocation, recipe.recipe, recipe.isFav, recipe.ingredients, recipe.nbrPeople, recipe.recipeId])
+        else:
+            c.execute("""INSERT INTO localRecipe (name, pictureLocation, recipe, isFav, ingredients, numberPeople)
+                                    VALUES (?, ?, ?, ?, ?, ?)""",
+                                    [recipe.name, recipe.pictureLocation, recipe.recipe, "False", recipe.ingredients, recipe.nbrPeople])
 
         conn.commit()
         c.close()
                                 
     def noDBMessage(self):
-        messagebox.showerror("Pas de base de donnée", "Aucun base de donnée n'a été trouvé, veuillez mettre a jour votre base de donnée de recette")
+        messagebox.showerror("Pas de base de données", "Aucun base de données n'a été trouvé, veuillez mettre a jour votre base de données de recette")
 
     def createLocalDB(self):
         conn = sqlite3.connect(self.dbName,detect_types= sqlite3.PARSE_COLNAMES)
         c=conn.cursor()
-        c.execute(""" CREATE TABLE localRecipe (name TEXT, pictureLocation TEXT, recipe TEXT, recipeId TEXT, isFav TEXT, ingredients TEXT, numberPeople INTEGER)""")
+        c.execute("""CREATE TABLE localRecipe (name TEXT, pictureLocation TEXT, recipe TEXT, recipeId TEXT, isFav TEXT, ingredients TEXT, numberPeople INTEGER)""")
         conn.commit()
         c.close()
         self.localDBCreationMessage()
@@ -137,28 +141,52 @@ class DataBase(object):
         c=conn.cursor()
 
         result = []
-        c.execute(""" SELECT * FROM onlineRecipe WHERE isFav='True' AND recipeId = (?)""", [recipeId,])
+        c.execute("""SELECT * FROM onlineRecipe WHERE isFav='True' AND recipeId = (?)""", [recipeId,])
         result += c.fetchall()
-        c.execute(""" SELECT * FROM localRecipe WHERE isFav='True' AND recipeId = (?)""", [recipeId,])
+        c.execute("""SELECT * FROM localRecipe WHERE isFav='True' AND recipeId = (?)""", [recipeId,])
         result += c.fetchall()
 
         if result == []: #no favorite found
-            c.execute(""" UPDATE onlineRecipe SET isFav='True' WHERE recipeId = (?)""", [recipeId,])    
-            c.execute(""" UPDATE localRecipe SET isFav='True' WHERE recipeId = (?)""", [recipeId,])    
+            c.execute("""UPDATE onlineRecipe SET isFav='True' WHERE recipeId = (?)""", [recipeId,])    
+            c.execute("""UPDATE localRecipe SET isFav='True' WHERE recipeId = (?)""", [recipeId,])    
         else:
-            c.execute(""" UPDATE onlineRecipe SET isFav='False' WHERE recipeId = (?)""", [recipeId,])    
-            c.execute(""" UPDATE localRecipe SET isFav='False' WHERE recipeId = (?)""", [recipeId,])
+            c.execute("""UPDATE onlineRecipe SET isFav='False' WHERE recipeId = (?)""", [recipeId,])    
+            c.execute("""UPDATE localRecipe SET isFav='False' WHERE recipeId = (?)""", [recipeId,])
         conn.commit()
         c.close()
 
     def localDBCreationMessage(self):
-        messagebox.showinfo("Creation de la base de donnée", "Creation de la base de donnée local contenant vos recettes") 
+        messagebox.showinfo("Creation de la base de données", "Creation de la base de données locale contenant vos recettes") 
 
-    def updateDB(self):
+    def updateDB(self,progress):
         try:
-            urllib.request.urlretrieve(rootUrl+"res/pic/recipeBDD"+, self.dbName)
-        except (urllib.request.HTTPError,urllib.request.URLError):
-            messagebox.showerror("Erreur de connexion'", "Une erreur de connexion est survenue, veuillez ré-essayer plus tard")            
+            urllib.request.urlretrieve(rootUrl+"recipeBDD",self.dbName+"tmp")
+        except (urllib.request.HTTPError,urllib.request.URLError) as e:
+            print(e)
+            return 0
+        connNew = sqlite3.connect(self.dbName+"tmp",detect_types= sqlite3.PARSE_COLNAMES)
+        cNew=connNew.cursor()
+        
+        cNew.execute("""SELECT name,pictureLocation,recipe,recipeId,isFav,ingredients,numberPeople FROM onlineRecipe""")
+        result = cNew.fetchall()
+
+        connOld = sqlite3.connect(self.dbName,detect_types= sqlite3.PARSE_COLNAMES)
+        cOld=connOld.cursor()
+        iMax = float(len(result))
+        # progressbar.configure(maximum=iMax)
+        # progressbar.start()
+        last = 0.0
+        for i, r in enumerate(result):
+            cOld.execute("""UPDATE onlineRecipe SET name=?,pictureLocation=?,recipe=?,isFav=?,ingredients=?,numberPeople=? where recipeId = ?""",
+                [r[0],r[1],r[2],r[4],r[5],r[6],r[3]])
+            delta = i/iMax-last
+            last = i/iMax
+            print(last*100)
+            progress.set(last*100)
+            # progressbar.step(1)
+            time.sleep(0.05)
+        # progressbar.stop()
+        return 1
 
 
 
