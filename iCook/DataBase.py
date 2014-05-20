@@ -73,7 +73,7 @@ class DataBase(object):
         except sqlite3.OperationalError:
             self.noDBMessage()
             return None
-        result = resultLocal+resultOnline
+        result = set(resultLocal+resultOnline)
         sortedResult = []
 
 
@@ -84,10 +84,8 @@ class DataBase(object):
             for ingredient in ingredientList:
                 if ingredient in r[5]:
                     score+=1
-
             sortedResult.append([r,score])
-        sorted(sortedResult,key=lambda r: r[1])
-
+        sortedResult = sorted(sortedResult,key=lambda r: -r[1])
         for r, score in sortedResult:
             yield Recipe.Recipe(r[0],r[1],r[2],r[3],ast.literal_eval(r[4]),r[5],r[6],isLocal=r[-1])
 
