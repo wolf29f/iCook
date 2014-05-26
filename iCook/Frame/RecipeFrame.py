@@ -46,7 +46,8 @@ class RecipeFrame(Frame.Frame):
         self.recipe = recipe
         picPath = os.path.dirname(os.path.realpath(__file__))+"/../res/pic/"+self.recipe.pictureLocation
         try:
-            self.pic = tk.PhotoImage(file=picPath)
+            if not self.recipe.isLocal: #TODO : Allow the user to add picture for their recipe
+                self.pic = tk.PhotoImage(file=picPath)
         except tk.TclError as e:            
             self.pic = None
             if recipe.isLocal:

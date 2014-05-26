@@ -4,6 +4,7 @@ import sqlite3
 import tkinter.messagebox as messagebox
 import ast
 import time
+import os
 
 from . import rootUrl
 import urllib.request
@@ -21,6 +22,7 @@ class DataBase(object):
 
         if not ("onlineRecipe",) in r:
             self.noDBMessage()
+            self.createOnlineDB()
         if not ("localRecipe",) in r:        
             self.createLocalDB()
         c.close()
@@ -127,10 +129,17 @@ class DataBase(object):
     def noDBMessage(self):
         messagebox.showerror("Pas de base de données", "Aucun base de données n'a été trouvé, veuillez mettre a jour votre base de données de recette")
 
+    def createOnlineDB(self):
+        conn = sqlite3.connect(self.dbName,detect_types= sqlite3.PARSE_COLNAMES)
+        c=conn.cursor()
+        c.execute("""CREATE TABLE onlineRecipe (name TEXT, pictureLocation TEXT, recipe TEXT, recipeId INTEGER PRIMARY KEY, isFav TEXT, ingredients TEXT, numberPeople INTEGER)""")
+        conn.commit()
+        c.close()
+
     def createLocalDB(self):
         conn = sqlite3.connect(self.dbName,detect_types= sqlite3.PARSE_COLNAMES)
         c=conn.cursor()
-        c.execute("""CREATE TABLE localRecipe (name TEXT, pictureLocation TEXT, recipe TEXT, recipeId TEXT, isFav TEXT, ingredients TEXT, numberPeople INTEGER)""")
+        c.execute("""CREATE TABLE localRecipe (name TEXT, pictureLocation TEXT, recipe TEXT, recipeId INTEGER PRIMARY KEY, isFav TEXT, ingredients TEXT, numberPeople INTEGER)""")
         conn.commit()
         c.close()
         self.localDBCreationMessage()
@@ -176,12 +185,17 @@ class DataBase(object):
         last = 0.0
 
         for i, r in enumerate(result):
-            cOld.execute("""UPDATE onlineRecipe SET name=?,pictureLocation=?,recipe=?,isFav=?,ingredients=?,numberPeople=? where recipeId = ?""",
-                [r[0],r[1],r[2],r[4],r[5],r[6],r[3]])
+            # cOld.execute("""UPDATE onlineRecipe SET name=?,pictureLocation=?,recipe=?,isFav=?,ingredients=?,numberPeople=? where recipeId = ?""",
+            cOld.execute("""INSERT OR REPLACE INTO onlineRecipe (name, pictureLocation, recipe, recipeId, isFav, ingredients, numberPeople) VALUES (?,?,?,?,?,?,?)""",
+                [r[0],r[1],r[2],r[3],r[4],r[5],r[6]])
             delta = i/iMax-last
             last = i/iMax
             progressbar.step(delta*100)
             progressbar.update()
+        connOld.commit()
+        cOld.close()
+        cNew.close()
+        os.remove(self.dbName+"tmp")
         return 1
 
 
