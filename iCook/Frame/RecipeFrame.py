@@ -26,7 +26,9 @@ class RecipeFrame(Frame.Frame):
 
         self.textContent = tk.Text(self,state="disable")
         self.textContent.tag_config("header",font=font.Font(size=22),justify="center")
-        self.textContent.tag_config("header2",font=font.Font(size=18),justify="center")        
+        self.textContent.tag_config("header2",font=font.Font(size=18),justify="center")
+        self.textContent.tag_config("bold",font=font.Font(weight="bold"))
+        
         self.textContent.tag_config("pic",justify="right")
 
         self.textContent.tag_config("list",lmargin1=20,lmargin2=20)
@@ -76,12 +78,31 @@ class RecipeFrame(Frame.Frame):
 
         self.textContent['state'] = 'normal'
         self.textContent.delete('1.0','end')
-        self.textContent.insert('end',"\n"+self.recipe.name+"\n\n",("header",))        
+        self.textContent.insert('end',"\n"+self.recipe.name+"\n\n",("header",))
         self.textContent.insert('end',"Recette pour %i personne(s)"%self.recipe.nbrPeople+"\n\n")
         self.textContent.insert('end',"Ingredients :\n")
-        self.textContent.insert('end',recipe.ingredients+"\n","list") 
+        self.textContent.insert('end',recipe.ingredients+"\n","list")
         self.textContent.insert('end',"Réalisation\n\n",("header2"))
         self.textContent.insert('end',self.recipe.recipe)
+
+
+
+        while 1:
+            content = self.textContent.get("1.1", "end")
+            print(content)
+        
+            i1 = content.find("<b>")
+            i2 = content.find("</b>")
+            if i1 >= 0 and i2 >= 0:
+                self.textContent.tag_add("bold","1.0 + "+str(i1+3)+" char","1.0 + "+str(i2+4)+" char")
+                self.textContent.delete("1.0 + "+str(i2)+" char", "1.0 + "+str(i2+4)+" char")
+                self.textContent.delete("1.0 + "+str(i1)+" char", "1.0 + "+str(i1+3)+" char")
+            else:
+                break
+
+
+
+
         self.textContent['state'] = 'disable'
 
 
