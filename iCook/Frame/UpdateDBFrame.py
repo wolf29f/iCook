@@ -14,20 +14,19 @@ class UpdateDBFrame(Frame.Frame):
         self.updateDBButton = tk.Button(self,text="Mettre a jour",command=self.updateDB)
         self.updateDBButton.pack(fill=tk.BOTH, expand=1)
         self.progress = tk.DoubleVar()
-        self.progressbar = ttk.Progressbar(self,  mode='determinate')
+        self.progressbar = ttk.Progressbar(self,  mode='determinate',  variable=self.progress)
         self.progressbar.pack(fill=tk.BOTH, expand=1)
 
     def updateDB(self):
         self.progress.set(0)
-        # self.progressbar.start()
+        self.progressbar.update()
         self.db = DataBase.DataBase()
-        if not self.db.updateDB(self.progress):
-            # self.progressbar.stop()
+        if not self.db.updateDB(self.progressbar):
             self.dbUpdateErrorMessage()
         else:
-            # self.progressbar.stop()
             self.dbUpdateSuccesMessage()
-        
+        self.progress.set(0)
+        self.progressbar.update()
 
     def dbUpdateErrorMessage(self):
         messagebox.showerror("Erreur de connexion'", "Une erreur de connexion est survenue, veuillez ré-essayer plus tard")            

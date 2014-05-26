@@ -158,7 +158,7 @@ class DataBase(object):
     def localDBCreationMessage(self):
         messagebox.showinfo("Creation de la base de données", "Creation de la base de données locale contenant vos recettes") 
 
-    def updateDB(self,progress):
+    def updateDB(self,progressbar):
         try:
             urllib.request.urlretrieve(rootUrl+"recipeBDD",self.dbName+"tmp")
         except (urllib.request.HTTPError,urllib.request.URLError) as e:
@@ -173,19 +173,15 @@ class DataBase(object):
         connOld = sqlite3.connect(self.dbName,detect_types= sqlite3.PARSE_COLNAMES)
         cOld=connOld.cursor()
         iMax = float(len(result))
-        # progressbar.configure(maximum=iMax)
-        # progressbar.start()
         last = 0.0
+
         for i, r in enumerate(result):
             cOld.execute("""UPDATE onlineRecipe SET name=?,pictureLocation=?,recipe=?,isFav=?,ingredients=?,numberPeople=? where recipeId = ?""",
                 [r[0],r[1],r[2],r[4],r[5],r[6],r[3]])
             delta = i/iMax-last
             last = i/iMax
-            print(last*100)
-            progress.set(last*100)
-            # progressbar.step(1)
-            time.sleep(0.05)
-        # progressbar.stop()
+            progressbar.step(delta*100)
+            progressbar.update()
         return 1
 
 

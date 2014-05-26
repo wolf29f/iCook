@@ -30,10 +30,10 @@ class RecipeFrame(Frame.Frame):
         self.textContent.tag_config("pic",justify="right")
 
         self.textContent.tag_config("list",lmargin1=20,lmargin2=20)
-        self.textContent.grid(row=1,column=0,sticky=tk.E+tk.W+tk.S+tk.N)
+        self.textContent.grid(row=1,column=0,sticky=tk.E+tk.W+tk.S+tk.N,columnspan=2)
 
         self.picLabel = tk.Label(self)
-        self.picLabel.grid(row=1,column=0,sticky=tk.E+tk.N,padx=(5,5),pady=(5,5))
+        self.picLabel.grid(row=1,column=0,sticky=tk.E+tk.N,padx=(5,5),pady=(5,5),columnspan=2)
 
 
     def editRecipe(self):
@@ -64,9 +64,9 @@ class RecipeFrame(Frame.Frame):
         if self.pic:
             self.picLabel.config(image=self.pic)
         if self.recipe.isLocal:
-            self.editButton.pack(side=tk.TOP,anchor="e") 
+            self.editButton.grid(column=1,row=0) 
         else:
-            self.editButton.pack_forget()
+            self.editButton.grid_forget()
 
         if self.recipe.isFav:
             self.favChoice.set(1)
@@ -82,7 +82,7 @@ class RecipeFrame(Frame.Frame):
         self.textContent.insert('end',"Réalisation\n\n",("header2"))
         self.textContent.insert('end',self.recipe.recipe)
         self.textContent['state'] = 'disable'
-        print("toto")
+
 
     def addToFav(self):
         db = DataBase.DataBase()
