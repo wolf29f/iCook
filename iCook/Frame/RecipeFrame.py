@@ -65,6 +65,8 @@ class RecipeFrame(Frame.Frame):
                         messagebox.showerror("Erreur de connexion'", "Une erreur de connexion est survenue, veuillez ré-essayer plus tard")            
         if self.pic:
             self.picLabel.config(image=self.pic)
+        else:
+            self.picLabel.grid_forget()
         if self.recipe.isLocal:
             self.editButton.grid(column=1,row=0) 
         else:
