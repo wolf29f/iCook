@@ -56,7 +56,6 @@ class RecipeFrame(Frame.Frame):
                 messagebox.showerror("Pas d'image", "Aucun image n'a été trouvé sur votre ordinateur, veuillez re-selection l'image en éditant la recette")
             else:
                 try:
-                    print(rootUrl+"res/pic/"+self.recipe.pictureLocation)
                     urllib.request.urlretrieve(rootUrl+"res/pic/"+self.recipe.pictureLocation, picPath)
                     try:
                         self.pic = tk.PhotoImage(file=picPath)
@@ -89,7 +88,6 @@ class RecipeFrame(Frame.Frame):
 
         while 1:
             content = self.textContent.get("1.1", "end")
-            print(content)
         
             i1 = content.find("<b>")
             i2 = content.find("</b>")
