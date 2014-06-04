@@ -13,14 +13,12 @@ class MainFrame(tk.Frame):
         tk.Frame.__init__(self,None)
         
         
-        s=ttk.Style()
-        # s.configure("TNotebook", background="#ff0000")
-        # print(s.element_options('TNotebook'))
+        
+        
+
         self.pack(fill=tk.BOTH, expand=1)
-        # self.pack_propagate(0)
-        self.master.geometry('800x600')
+        self.master.geometry('800x600+'+str(int((self.master.winfo_screenwidth()-800)/2))+"+"+str(int((self.master.winfo_screenheight()-600)/2)))
         self.master.title("iCook, do you?")
-        # self.master.resizable(0,0)
 
         self.noteBook = ttk.Notebook(self)
         self.noteBook.pack(fill=tk.BOTH, expand=1)

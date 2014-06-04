@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, time
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 rootUrl = "http://bad-wolf.fr/partage/iCook/"      #the url where are all data
 if not os.path.isdir(os.path.dirname(os.path.realpath(__file__))+"/res"):
@@ -11,4 +11,7 @@ from . import Recipe
 from . import Frame
 from . import DataBase
 
+
 app = Frame.MainFrame.MainFrame()
+
+splash = Frame.Splash.SplashFrame(app)
